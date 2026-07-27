@@ -86,14 +86,14 @@ style: fix spacing on mobile job list
 
 - **No TypeScript** — plain JSX throughout; do not add `.ts`/`.tsx` files
 - **Functional components only** — no class components
-- **Named exports** preferred over default exports for components
+- **Default exports** for all components and pages (established convention — every file in `src/components/` and `src/pages/` uses `export default`)
 - Keep components focused — extract reusable pieces into `src/components/`
 
 ### Styling
 
 - Use **Tailwind CSS utility classes** exclusively — no inline styles, no CSS modules
 - Follow mobile-first responsive design (`sm:`, `md:`, `lg:` breakpoints)
-- Dark mode via `ThemeContext` — use conditional class toggling, not `dark:` variants
+- Dark mode uses Tailwind `dark:` variants throughout components (class-based, via `@variant dark (.dark &)` in `index.css`) — `ThemeContext` toggles the `dark`/`light` class on `document.documentElement`; components should keep using `dark:` classes, not manual conditional class logic
 
 ### State & Data
 
@@ -130,7 +130,9 @@ Provider nesting order (in App.jsx): AuthProvider → JobsDataProvider → JobPr
 
 Currently uses **mock data** with localStorage persistence — no real backend. Services in `src/services/` simulate async API calls using `delay()` from `src/utils/delay.js`. Data originates from `src/data/mockData.js`.
 
-Key localStorage keys: `jobPortalUser`, `authToken`, `registeredUsers`, `globalPostedJobs`, `jobApplications_{userId}`, `savedJobs_{userId}`, `postedJobs_{userId}`.
+Key localStorage keys: `jobPortalUser`, `authToken`, `registeredUsers`, `job-portal-theme`, `globalPostedJobs`, `globalApplications`, `jobApplications_{userId}`, `savedJobIds_{userId}`, `userProfile_{userId}`, `postedJobs_{userId}`, `allApplications_{userId}`, `contactMessages`, `companiesOverrides`, `deletedCompanyIds`.
+
+Note: `JobContext`'s in-memory fallback cache uses slightly different key names (`appliedJobs_{userId}`, `savedJobs_{userId}`) than the services that actually own the data (`jobApplications_{userId}` in `jobApplicationService.js`, `savedJobIds_{userId}` in `savedJobService.js`). This mismatch is pre-existing — don't assume the fallback and the service read/write the same key.
 
 ### Routing & Roles
 
@@ -144,7 +146,3 @@ Three roles with route protection via `ProtectedRoute` component:
 
 - Font Awesome + Lucide React for icons
 - react-toastify for notifications
-
-### ESLint
-
-Flat config (`eslint.config.js`). The `no-unused-vars` rule ignores variables starting with uppercase or underscore (`varsIgnorePattern: '^[A-Z_]'`).
